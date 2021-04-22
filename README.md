@@ -40,6 +40,8 @@ Options:
   --minify                                include code minifier plugin for Webpack
   --watch                                 Webpack watch changes
   --dev-server [port]                     port of webpack-dev-server
+  --src <src>                             entry directory for Webpack
+  --dist <dist>                           output directory for Webpack
   --typing                                install typing packages
   --no-install                            do not install packages
   --no-clone                              do not clone static files
@@ -66,6 +68,8 @@ Options:
 | `minify` | include code minifier plugin for Webpack | `false` |
 | `watch` | webpack watch changes after build | `false` |
 | `dev-server [port]` | set webpack dev server port<br>`9000` if only flag is set | `false` |
+| `src <src>` | entry directory for Webpack<br>i.e. entry file located at `./src/index.jsx` | `./src` |
+|  `dist <dist>` | output directory for Webpack | `./dist` |
 | `typing` | install typing packages | `false` |
 | `no-install` | do not install packages | `false` |
 | `no-clone` | do not clone static files ([file list](#static-files)) | `false` |
@@ -212,6 +216,8 @@ Options:
   --minify             include code minifier plugin for Webpack
   --watch              Webpack watch changes
   --dev-server [port]  port of webpack-dev-server
+  --src <src>          entry directory for Webpack
+  --dist <dist>        output directory for Webpack
   --typing             install typing packages
   --no-install         do not install packages
   -h, --help           display help for command

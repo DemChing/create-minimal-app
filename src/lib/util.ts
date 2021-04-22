@@ -190,32 +190,33 @@ export const WriteFile = (dir: string, filename: string, content: string, force:
     })
 )
 
-export const PathResolve = (dir: string = '') => Path.resolve(__dirname, `../../${dir}`)
+export const PathResolve = (dir: string = '', root: string = '') => root ? Path.resolve(root, dir) : Path.resolve(__dirname, `../../${dir}`)
 
-export const CopyFile = (dir: string, filename: string, ts: boolean = false, force: boolean = false) => Progress(
-    `Copy file ${WarningMessage(filename)}`,
-    () => new Promise(async resolve => {
-        let _filename = filename.replace('.txt', '');
-        if (ts) _filename = _filename.replace(/\.js(x)?$/, '.ts$1');
-        let _path = `${dir}${_filename}`,
-            _dir = Path.dirname(_path),
-            __filename = _path.replace(_dir, ''),
-            result = await CanWriteFile(_dir, __filename, force);
-        if (result.success) {
-            try {
-                copyFileSync(PathResolve(`${FilesPath}${filename}`), _path);
-            } catch (e) {
-                console.log(e)
-                result.success = false;
-                delete result.skip;
+export const CopyFile = (from: string, to: string, ts: boolean = false, force: boolean = false) => {
+    let filename = to.replace(/\.txt$/, '');
+    if (ts) filename = filename.replace(/\.js(x)?$/, '.ts$1');
+    let dir = Path.dirname(filename),
+        _filename = filename.replace(dir, '');
+    return Progress(
+        `Copy file ${WarningMessage(from)} to ${WarningMessage(filename)}`,
+        () => new Promise(async resolve => {
+            let result = await CanWriteFile(dir, _filename, force);
+            if (result.success) {
+                try {
+                    copyFileSync(PathResolve(from), filename);
+                } catch (e) {
+                    console.log(e)
+                    result.success = false;
+                    delete result.skip;
+                }
+            } else if (result.skip) {
+                result.success = true;
             }
-        } else if (result.skip) {
-            result.success = true;
-        }
 
-        resolve(result);
-    })
-)
+            resolve(result);
+        })
+    )
+}
 
 export const CreateDir = (dirType: string, dir: string, force: boolean = false) => Progress(
     `Create ${dirType} directory ${WarningMessage(dir)}`,

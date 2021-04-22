@@ -39,13 +39,15 @@ exports.__esModule = true;
 var util_1 = require("./util");
 var fs_1 = require("fs");
 var variables_1 = require("../variables");
-function CloneStaticFiles(dir, ts, force) {
+function CloneStaticFiles(dir, _a, force) {
     var _this = this;
-    if (ts === void 0) { ts = false; }
+    var _b = _a.ts, ts = _b === void 0 ? false : _b, _c = _a.src, src = _c === void 0 ? '' : _c, _d = _a.dist, dist = _d === void 0 ? '' : _d;
     if (force === void 0) { force = false; }
     var msg = "Clone static files";
+    src = src || variables_1.SrcPath;
+    dist = dist || variables_1.DistPath;
     return util_1.Progress(msg, function () { return new Promise(function (resolve) { return __awaiter(_this, void 0, void 0, function () {
-        var files, dirs, result, count, readDirectory, directories, filePromise, dirPromise;
+        var files, dirs, result, count, AppBasePath, AppSrcPath, AppDistPath, FileBasePath, FilesSrcPath, FilesDistPath, replacePath, readDirectory, directories, filePromise, dirPromise;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -60,19 +62,35 @@ function CloneStaticFiles(dir, ts, force) {
                         file: 0,
                         skip: 0
                     };
+                    AppBasePath = util_1.PathResolve(dir, '.');
+                    AppSrcPath = util_1.PathResolve(src, dir);
+                    AppDistPath = util_1.PathResolve(dist, dir);
+                    FileBasePath = util_1.PathResolve(variables_1.FilesPath);
+                    FilesSrcPath = util_1.PathResolve(variables_1.SrcPath, FileBasePath);
+                    FilesDistPath = util_1.PathResolve(variables_1.DistPath, FileBasePath);
+                    replacePath = function (from) {
+                        var to = util_1.PathResolve(from);
+                        if (to.indexOf(FilesSrcPath) != -1)
+                            to = to.replace(FilesSrcPath, AppSrcPath);
+                        if (to.indexOf(FilesDistPath) != -1)
+                            to = to.replace(FilesDistPath, AppDistPath);
+                        if (to.indexOf(FileBasePath) != -1)
+                            to = to.replace(FileBasePath, AppBasePath);
+                        return to.replace(AppBasePath, dir).replace(/\\/g, '/');
+                    };
                     readDirectory = function (path) {
                         fs_1.readdirSync(util_1.PathResolve(path)).map(function (file) {
                             var src = path + "/" + file;
                             if (file.indexOf('.') !== -1) {
                                 if (!/ts/i.test(file) || ts) {
-                                    files.push(src.replace(variables_1.FilesPath, ''));
+                                    files.push([src, replacePath(src)]);
                                     if (dirs.file.indexOf(path) == -1)
                                         dirs.file.push(path);
                                 }
                             }
                             else {
-                                if (dirs.all.indexOf(path) == -1)
-                                    dirs.all.push(path);
+                                if (dirs.all.indexOf(src) == -1)
+                                    dirs.all.push(src);
                                 readDirectory(src);
                             }
                         });
@@ -80,12 +98,12 @@ function CloneStaticFiles(dir, ts, force) {
                     readDirectory(variables_1.FilesPath);
                     directories = dirs.all
                         .filter(function (v) { return dirs.file.indexOf(v) == -1; })
-                        .map(function (v) { return v.replace(variables_1.FilesPath, "./" + dir); });
+                        .map(function (v) { return replacePath(v); });
                     filePromise = function (i) {
                         if (i === void 0) { i = 0; }
                         return new Promise(function (resolve) {
                             count.file++;
-                            util_1.CopyFile(dir, files[i], ts, force)
+                            util_1.CopyFile(files[i][0], files[i][1], ts, force)
                                 .then(function (res) {
                                 result.success = result.success && res.success;
                                 if (res.skip)

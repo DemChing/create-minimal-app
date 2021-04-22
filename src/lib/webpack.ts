@@ -15,6 +15,8 @@ interface IWebpackOptions {
     minify?: boolean;
     watch?: boolean;
     devServer?: boolean | number;
+    src?: string;
+    dist?: string;
 }
 
 const toVar = (name: string) => name.split('-').map(v => v[0].toUpperCase() + v.slice(1)).join('');
@@ -51,15 +53,19 @@ const PackageConfig: IPackageConfig = {
     }
 }
 
-const generate = ({
+export default function CreateWebpackConfigJs(dir: string, {
     css = false,
     scss = false,
     ts = false,
     minify = false,
     watch = false,
-    devServer = false
-}: IWebpackOptions) => {
+    devServer = false,
+    src = '',
+    dist = '',
+}: IWebpackOptions, force: boolean = false) {
+
     let packages = ['path'],
+        plugins = [],
         extensions = ['jsx', 'js'],
         optimization = '';
 
@@ -74,9 +80,15 @@ const generate = ({
         return code;
     };
 
+    src = src || SrcPath;
+    dist = dist || DistPath;
+
     if (css || scss) extensions.push('css');
     if (scss) extensions.push('scss', 'sass');
-    if (ts) extensions.push('tsx', 'ts');
+    if (ts) {
+        extensions.push('tsx', 'ts');
+        plugins.push(toCode('forkTs'));
+    }
 
     if (minify) {
         optimization = `optimization: {
@@ -96,18 +108,18 @@ const generate = ({
         },`;
     }
 
-    return `${packages.map(name => `const ${toVar(name)} = require('${name}')`).join('\n')}
+    let content = `${packages.map(name => `const ${toVar(name)} = require('${name}')`).join('\n')}
 
 module.exports = {
     entry: {
         app: {
-            import: '${SrcPath}/index.${ts ? 't' : 'j'}sx',
+            import: '${src}/index.${ts ? 't' : 'j'}sx',
             dependOn: ['vendor'],
         },
         vendor: ['react', 'react-dom'],
     },
     output: {
-        path: ${toVar('path')}.resolve(__dirname, '${DistPath}'),
+        path: ${toVar('path')}.resolve(__dirname, '${dist}'),
         filename: '[name].bundle.js',
     },
     ${optimization}
@@ -158,30 +170,20 @@ module.exports = {
         ],
     },
     plugins: [
-        ${ts ? toCode('forkTs') : ''}
+        ${plugins.filter(v => Boolean(v)).join('\n        ')}
     ],
     resolve: {
-        extensions: [${extensions.map(ext => `'.${ext}'`).join()}],
+        extensions: [${extensions.map(ext => `'.${ext}'`).join(', ')}],
     },
     watch: ${watch},
     watchOptions: {
         ignored: /node_modules/,
     },
     ${devServer ? `{
-        contentBase: ${toVar('path')}.resolve(__dirname, '${DistPath}'),
+        contentBase: ${toVar('path')}.resolve(__dirname, '${dist}'),
         compress: true,
         port: ${typeof devServer === 'number' ? devServer : 9000},
     }` : ''}
-}`.trim()
-}
-
-export default function CreateWebpackConfigJs(dir: string, options: IWebpackOptions, force: boolean = false) {
-    return WriteFile(dir, WebpackFilename, generate({
-        css: options.css,
-        scss: options.scss,
-        ts: options.ts,
-        minify: options.minify,
-        watch: options.watch,
-        devServer: options.devServer,
-    }), force)
+}`.trim();
+    return WriteFile(dir, WebpackFilename, content, force)
 }

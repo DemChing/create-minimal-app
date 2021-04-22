@@ -79,6 +79,8 @@ program
     .option('--minify', 'include code minifier plugin for Webpack')
     .option('--watch', 'Webpack watch changes')
     .option('--dev-server [port]', 'port of webpack-dev-server')
+    .option('--src <src>', 'entry directory for Webpack')
+    .option('--dist <dist>', 'output directory for Webpack')
     .option('--typing', 'install typing packages')
     .option('--no-install', 'do not install packages')
     .option('--no-clone', 'do not clone static files')
@@ -153,7 +155,9 @@ program
                     ts: options.ts,
                     minify: options.minify,
                     watch: options.watch,
-                    devServer: options.devServer
+                    devServer: options.devServer,
+                    src: options.src,
+                    dist: options.dist
                 }, options.force)];
             case 6:
                 _a.sent();
@@ -161,7 +165,11 @@ program
             case 7:
                 _a.sent();
                 if (!options.clone) return [3 /*break*/, 9];
-                return [4 /*yield*/, clone_1["default"](cwd, options.ts, options.force)];
+                return [4 /*yield*/, clone_1["default"](cwd, {
+                        ts: options.ts,
+                        src: options.src,
+                        dist: options.dist
+                    }, options.force)];
             case 8:
                 _a.sent();
                 _a.label = 9;

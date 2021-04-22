@@ -65,6 +65,8 @@ program
     .option('--minify', 'include code minifier plugin for Webpack')
     .option('--watch', 'Webpack watch changes')
     .option('--dev-server [port]', 'port of webpack-dev-server')
+    .option('--src <src>', 'entry directory for Webpack')
+    .option('--dist <dist>', 'output directory for Webpack')
     .option('--typing', 'install typing packages')
     .option('--no-install', 'do not install packages')
     .action(function (appName, options) { return __awaiter(void 0, void 0, void 0, function () {
@@ -88,7 +90,9 @@ program
                     ts: options.ts,
                     minify: options.minify,
                     watch: options.watch,
-                    devServer: options.devServer
+                    devServer: options.devServer,
+                    src: options.src,
+                    dist: options.dist
                 }, options.force)];
             case 3:
                 _a.sent();

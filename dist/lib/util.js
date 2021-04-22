@@ -63,7 +63,6 @@ var path_1 = __importDefault(require("path"));
 var readline_1 = __importDefault(require("readline"));
 var fs_1 = require("fs");
 var child_process_1 = require("child_process");
-var variables_1 = require("../variables");
 var package_json_1 = require("./package-json");
 var ExistCMD = {
     npm: true
@@ -272,28 +271,28 @@ exports.WriteFile = function (dir, filename, content, force) {
         });
     }); }); });
 };
-exports.PathResolve = function (dir) {
+exports.PathResolve = function (dir, root) {
     if (dir === void 0) { dir = ''; }
-    return path_1["default"].resolve(__dirname, "../../" + dir);
+    if (root === void 0) { root = ''; }
+    return root ? path_1["default"].resolve(root, dir) : path_1["default"].resolve(__dirname, "../../" + dir);
 };
-exports.CopyFile = function (dir, filename, ts, force) {
+exports.CopyFile = function (from, to, ts, force) {
     if (ts === void 0) { ts = false; }
     if (force === void 0) { force = false; }
-    return exports.Progress("Copy file " + exports.WarningMessage(filename), function () { return new Promise(function (resolve) { return __awaiter(void 0, void 0, void 0, function () {
-        var _filename, _path, _dir, __filename, result;
+    var filename = to.replace(/\.txt$/, '');
+    if (ts)
+        filename = filename.replace(/\.js(x)?$/, '.ts$1');
+    var dir = path_1["default"].dirname(filename), _filename = filename.replace(dir, '');
+    return exports.Progress("Copy file " + exports.WarningMessage(from) + " to " + exports.WarningMessage(filename), function () { return new Promise(function (resolve) { return __awaiter(void 0, void 0, void 0, function () {
+        var result;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    _filename = filename.replace('.txt', '');
-                    if (ts)
-                        _filename = _filename.replace(/\.js(x)?$/, '.ts$1');
-                    _path = "" + dir + _filename, _dir = path_1["default"].dirname(_path), __filename = _path.replace(_dir, '');
-                    return [4 /*yield*/, exports.CanWriteFile(_dir, __filename, force)];
+                case 0: return [4 /*yield*/, exports.CanWriteFile(dir, _filename, force)];
                 case 1:
                     result = _a.sent();
                     if (result.success) {
                         try {
-                            fs_1.copyFileSync(exports.PathResolve("" + variables_1.FilesPath + filename), _path);
+                            fs_1.copyFileSync(exports.PathResolve(from), filename);
                         }
                         catch (e) {
                             console.log(e);

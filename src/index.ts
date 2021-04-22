@@ -38,6 +38,8 @@ interface IOptions extends OptionValues {
     // webpack
     watch?: boolean;
     devServer?: boolean | number;
+    src?: string;
+    dist?: string;
 
     clone?: boolean;
     install?: boolean;
@@ -81,6 +83,8 @@ program
     .option('--minify', 'include code minifier plugin for Webpack')
     .option('--watch', 'Webpack watch changes')
     .option('--dev-server [port]', 'port of webpack-dev-server')
+    .option('--src <src>', 'entry directory for Webpack')
+    .option('--dist <dist>', 'output directory for Webpack')
     .option('--typing', 'install typing packages')
     .option('--no-install', 'do not install packages')
     .option('--no-clone', 'do not clone static files')
@@ -142,12 +146,18 @@ program
             minify: options.minify,
             watch: options.watch,
             devServer: options.devServer,
+            src: options.src,
+            dist: options.dist,
         }, options.force);
 
         await CreatePackageJson(cwd, packageJSON, options.force);
 
         if (options.clone) {
-            await CloneStaticFiles(cwd, options.ts, options.force);
+            await CloneStaticFiles(cwd, {
+                ts: options.ts,
+                src: options.src,
+                dist: options.dist,
+            }, options.force);
         }
 
         if (options.install) {
