@@ -121,6 +121,12 @@ __Code Minification__ (`--minify`)
 
 - `terser-webpack-plugin`
 
+
+### Dev Server
+Your may want to include the `webpack-dev-server` by passing `--dev-server [port]`.
+
+Port `9000` will be used as default.
+
 ## Repository
 You can pass `--git <git-repo-url>` or `--repo, --repository <repository>` to set the repository of your app.
 
