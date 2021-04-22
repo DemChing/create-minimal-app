@@ -1,7 +1,7 @@
 {
     "name": "create-minimal-app",
     "description": "Create a React application with minimal dependencies and configuration",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "bin": {
         "create-minimal-app": "dist/index.js",
         "cma": "dist/index.js",
