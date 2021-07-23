@@ -14,6 +14,7 @@ const Packages = {
         'ts-loader',
         'typescript',
         'fork-ts-checker-webpack-plugin',
+        '@babel/preset-typescript',
     ],
     minify: [
         'terser-webpack-plugin',

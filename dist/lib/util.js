@@ -46,12 +46,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __spreadArrays = (this && this.__spreadArrays) || function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
+var __spreadArray = (this && this.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
 };
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -85,36 +83,42 @@ var ProcessMessage = function (msgType, msg) {
         args[_i - 2] = arguments[_i];
     }
     var color = msgType === 'Error' ? chalk_1["default"].red : msgType === 'Warning' ? chalk_1["default"].yellow : chalk_1["default"].green;
-    return color(ReplaceMessage.apply(void 0, __spreadArrays([msg], args)).trim());
+    return color(ReplaceMessage.apply(void 0, __spreadArray([msg], args)).trim());
 };
-exports.BoldMessage = function (msg) { return chalk_1["default"].bold(msg); };
-exports.SuccessMessage = function (msg) {
+var BoldMessage = function (msg) { return chalk_1["default"].bold(msg); };
+exports.BoldMessage = BoldMessage;
+var SuccessMessage = function (msg) {
     if (msg === void 0) { msg = 'Success'; }
     var args = [];
     for (var _i = 1; _i < arguments.length; _i++) {
         args[_i - 1] = arguments[_i];
     }
-    return ProcessMessage.apply(void 0, __spreadArrays(['Success', msg], args));
+    return ProcessMessage.apply(void 0, __spreadArray(['Success', msg], args));
 };
-exports.ErrorMessage = function (msg) {
+exports.SuccessMessage = SuccessMessage;
+var ErrorMessage = function (msg) {
     if (msg === void 0) { msg = 'Fail'; }
     var args = [];
     for (var _i = 1; _i < arguments.length; _i++) {
         args[_i - 1] = arguments[_i];
     }
-    return ProcessMessage.apply(void 0, __spreadArrays(['Error', msg], args));
+    return ProcessMessage.apply(void 0, __spreadArray(['Error', msg], args));
 };
-exports.WarningMessage = function (msg) {
+exports.ErrorMessage = ErrorMessage;
+var WarningMessage = function (msg) {
     if (msg === void 0) { msg = 'Skip'; }
     var args = [];
     for (var _i = 1; _i < arguments.length; _i++) {
         args[_i - 1] = arguments[_i];
     }
-    return ProcessMessage.apply(void 0, __spreadArrays(['Warning', msg], args));
+    return ProcessMessage.apply(void 0, __spreadArray(['Warning', msg], args));
 };
-exports.ShortName = function (name) { return name.split('-').reduce(function (p, c) { return p += c[0]; }, ''); };
-exports.SelfPackageJson = function () { return package_json_1.ReadPackageJson(exports.PathResolve()); };
-exports.ProgramInfo = function (name) {
+exports.WarningMessage = WarningMessage;
+var ShortName = function (name) { return name.split('-').reduce(function (p, c) { return p += c[0]; }, ''); };
+exports.ShortName = ShortName;
+var SelfPackageJson = function () { return package_json_1.ReadPackageJson(exports.PathResolve()); };
+exports.SelfPackageJson = SelfPackageJson;
+var ProgramInfo = function (name) {
     if (name === void 0) { name = ''; }
     var _a = exports.SelfPackageJson(), PackageName = _a.name, PackageVersion = _a.version;
     var suffix = name ? "-" + name : '', cmd = PackageName + suffix, scmd = exports.ShortName(cmd), start = Date.now();
@@ -126,7 +130,8 @@ exports.ProgramInfo = function (name) {
         done: function () { return "\n" + exports.BoldMessage(cmd) + " finish (" + Math.round((Date.now() - start) / 1000) + "s)"; }
     };
 };
-exports.ValidateAppName = function (appName, force) {
+exports.ProgramInfo = ProgramInfo;
+var ValidateAppName = function (appName, force) {
     if (appName === void 0) { appName = ''; }
     if (force === void 0) { force = false; }
     var msg = '';
@@ -146,7 +151,8 @@ exports.ValidateAppName = function (appName, force) {
     }
     return appName;
 };
-exports.Progress = function (msg, promiseFn, exitOnFail) {
+exports.ValidateAppName = ValidateAppName;
+var Progress = function (msg, promiseFn, exitOnFail) {
     if (exitOnFail === void 0) { exitOnFail = false; }
     return new Promise(function (resolve, reject) {
         var pid = Math.floor(Math.random() * 9999) + 1;
@@ -185,7 +191,8 @@ exports.Progress = function (msg, promiseFn, exitOnFail) {
         });
     });
 };
-exports.HasDirOrFile = function (dir) {
+exports.Progress = Progress;
+var HasDirOrFile = function (dir) {
     var has = 'none';
     try {
         var stat = fs_1.statSync(dir);
@@ -199,7 +206,8 @@ exports.HasDirOrFile = function (dir) {
     catch (e) { }
     return has;
 };
-exports.CanWriteFile = function (dir, filename, force) {
+exports.HasDirOrFile = HasDirOrFile;
+var CanWriteFile = function (dir, filename, force) {
     if (force === void 0) { force = false; }
     return new Promise(function (resolve) { return __awaiter(void 0, void 0, void 0, function () {
         var path, has, result, create, cDir;
@@ -247,7 +255,8 @@ exports.CanWriteFile = function (dir, filename, force) {
         });
     }); });
 };
-exports.WriteFile = function (dir, filename, content, force) {
+exports.CanWriteFile = CanWriteFile;
+var WriteFile = function (dir, filename, content, force) {
     if (force === void 0) { force = false; }
     return exports.Progress("Create file " + exports.WarningMessage(filename), function () { return new Promise(function (resolve) { return __awaiter(void 0, void 0, void 0, function () {
         var result;
@@ -271,12 +280,14 @@ exports.WriteFile = function (dir, filename, content, force) {
         });
     }); }); });
 };
-exports.PathResolve = function (dir, root) {
+exports.WriteFile = WriteFile;
+var PathResolve = function (dir, root) {
     if (dir === void 0) { dir = ''; }
     if (root === void 0) { root = ''; }
     return root ? path_1["default"].resolve(root, dir) : path_1["default"].resolve(__dirname, "../../" + dir);
 };
-exports.CopyFile = function (from, to, ts, force) {
+exports.PathResolve = PathResolve;
+var CopyFile = function (from, to, ts, force) {
     if (ts === void 0) { ts = false; }
     if (force === void 0) { force = false; }
     var filename = to.replace(/\.txt$/, '');
@@ -309,7 +320,8 @@ exports.CopyFile = function (from, to, ts, force) {
         });
     }); }); });
 };
-exports.CreateDir = function (dirType, dir, force) {
+exports.CopyFile = CopyFile;
+var CreateDir = function (dirType, dir, force) {
     if (force === void 0) { force = false; }
     return exports.Progress("Create " + dirType + " directory " + exports.WarningMessage(dir), function () { return new Promise(function (resolve) {
         var has = exports.HasDirOrFile(dir), dirExist = has == 'directory', result = {
@@ -335,7 +347,8 @@ exports.CreateDir = function (dirType, dir, force) {
         resolve(result);
     }); }, true);
 };
-exports.HasExternalCMD = function (cmd, opts) {
+exports.CreateDir = CreateDir;
+var HasExternalCMD = function (cmd, opts) {
     if (opts === void 0) { opts = {}; }
     return new Promise(function (resolve) { return __awaiter(void 0, void 0, void 0, function () {
         var result, _a;
@@ -365,7 +378,8 @@ exports.HasExternalCMD = function (cmd, opts) {
         });
     }); });
 };
-exports.ExternalCMD = function (msg, cmd, args, opts, silent) {
+exports.HasExternalCMD = HasExternalCMD;
+var ExternalCMD = function (msg, cmd, args, opts, silent) {
     if (args === void 0) { args = []; }
     if (opts === void 0) { opts = {}; }
     if (silent === void 0) { silent = false; }
@@ -389,7 +403,8 @@ exports.ExternalCMD = function (msg, cmd, args, opts, silent) {
             result.success ? resolve(result) : reject(result)); });
     });
 };
-exports.RunCMD = function (msg, cmd, args, opts) {
+exports.ExternalCMD = ExternalCMD;
+var RunCMD = function (msg, cmd, args, opts) {
     if (args === void 0) { args = []; }
     if (opts === void 0) { opts = {}; }
     return exports.Progress(msg, function () { return new Promise(function (resolve) { return __awaiter(void 0, void 0, void 0, function () {
@@ -419,3 +434,4 @@ exports.RunCMD = function (msg, cmd, args, opts) {
         });
     }); }); });
 };
+exports.RunCMD = RunCMD;
